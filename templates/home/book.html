@@ -1,0 +1,174 @@
+{% extends 'base/base.html' %}
+
+{% block content %}
+{% load static %}
+{% include 'base/message.html' %}
+<link rel="stylesheet" type = "text/css" href="{% static 'home/book.css' %}">
+
+<div class="container">
+    <div class="left">
+        <h2>{{book.title}}</h2>
+        <p><strong>Author:</strong> {{book.author}}</p>
+        <p><strong>Publisher:</strong> {{book.publisher}}</p>
+        <p><strong>Language:</strong> {{book.language}}</p>
+        <p><strong>Publication:</strong> {{book.publication}}</p>
+        <p><strong>Description:</strong> {{book.description}}</p>
+    
+        {% if book.pdfFile %}
+        <a href="{% url 'home:bookPDF' book.id %}" class="btn">Read Book</a>
+        {% endif %}
+        {% if user.is_authenticated and user.role >= 1 %}
+        <a href="{% url 'mod:addCopy' book.id %}" class="btn">Add Copy</a>
+        <a href="{% url 'mod:editBook' book.id %}" class="btn">Edit Book</a>
+        {% endif %}
+        
+        <p><strong>Choose a provider:</strong></p>
+        <form id="borrowForm" action="{% url 'home:borrow' %}" method="post">
+        {% csrf_token %}
+        <div class="dropdown">
+            <input type="text" id="selectedOption" value="Please select a provider" readonly name="source"> <!-- Default value set to "Please select a provider" -->
+            <button class="dropdown-button" onclick="toggleDropdown()">
+              <span class="down-arrow"></span>
+              <span class="text">Dropdown</span>
+            </button>
+            <div class="dropdown-content" id="dropdownContent">
+                {% for mod, count in mods_objects_dict.items %}
+                <a href="#" onclick="selectOption('{{ mod.first_name }}', '{{ mod.id }}', event)">{{ mod.first_name }} ({{ count }} copies available)</a>
+                {% endfor %}
+            </div>
+        </div>
+          
+        <input type="hidden" name="bookID" value="{{ book.id }}">
+        <input type="hidden" name="userID" value="{{ user.id }}">
+
+<!-- Container for "See more books" links -->
+<div class="see-more-container">
+    {% for mod, count in mods_objects_dict.items %}
+    <a id="seeOption{{ mod.id }}" href="{% url 'home:shelf' mod.id %}" style="display: none;">See more books of {{ mod.first_name }}</a>
+    {% endfor %}
+</div>
+<button type="submit" class="btn">Borrow</button>
+</form>
+<script>
+
+    function validateAndSubmitForm(event) {
+        var selectedOptionInput = document.getElementById("selectedOption");
+        
+        if (selectedOptionInput.value === "Please select a provider") {
+            // If the selected option is still the default one, display an alert message
+            alert("Please select a provider");
+            event.preventDefault(); // Prevent the form from being submitted
+        }
+    }
+    
+    document.getElementById("borrowForm").addEventListener("submit", validateAndSubmitForm);
+
+
+    document.addEventListener('click', function(event) {
+      var dropdownContent = document.getElementById("dropdownContent");
+      var selectedOptionInput = document.getElementById("selectedOption");
+      
+      if (!event.target.matches('.dropdown-button') && !event.target.matches('.dropdown-content')) {
+        dropdownContent.style.display = "none";
+      }
+    });
+    
+    function toggleDropdown() {
+      event.preventDefault();
+      var dropdownContent = document.getElementById("dropdownContent");
+      if (dropdownContent.style.display === "none" || dropdownContent.style.display === "") {
+        dropdownContent.style.display = "block";
+      } else {
+        dropdownContent.style.display = "none";
+      }
+    }
+    
+    function selectOption(name, id, event) {
+        event.preventDefault();
+        var selectedOptionInput = document.getElementById("selectedOption");
+        selectedOptionInput.value = name;
+    
+        // Show the corresponding link based on the selected option
+        {% for mod, count in mods_objects_dict.items %}
+        document.getElementById("seeOption{{ mod.id }}").style.display = id === '{{ mod.id }}' ? 'inline' : 'none';
+        {% endfor %}
+    }
+    
+    // Display the "See more books" link for the default option initially
+    var defaultOption = document.getElementById("selectedOption").value;
+    selectOption(defaultOption, event); // Pass the event as an argument to the function
+    </script>
+        
+            </div>
+            <div class="right">
+                {% if book.coverImage %}
+                    {% if book.manual == True  %}
+                    <img src="/media/{{ book.coverImage }}"  alt="image">
+                    {% else %}
+                    <img src="{{ book.coverImage }}"  alt="image">
+                    {% endif %}
+                {% else %}
+                <img src="/media/book/defaultCover.jpg"  alt="image">
+                {% endif %}
+            </div>
+        </div>
+<div class = "container">
+    <div class="left">
+        <h3>Rating & Reviews</h3>
+        
+        {% if user.username %}
+        <form method="post" action="" class="mt-6 bg-gray-100 rounded-sm">
+        {% csrf_token %}
+        {% for key, value in form.error.items %}
+            {{value}}
+        {% endfor %}
+
+        {{form.bookID.as_hidden}}
+        {{form.userID.as_hidden}}
+        <label>Rating: </label>
+            {{form.rating}}
+        <br>
+        <label>Review: </label>
+            {{form.review}}
+        <br>
+            {{form.created_at.as_hidden}}
+        <div>
+            <button type="submit" class = "submit">Submit</button>
+        </div>
+        {% endif %}
+        </form>
+    </div>
+</div>
+
+    
+<div class="container">
+    {% if book.reviews.all %}
+    <div class="left">
+        <h3>Reader Reviews</h3>
+        {% for review in book.reviews.all reversed %}
+            <div class="comment">
+                <span style="float: left; width: 70px;">
+                  {% if review.userID.avatar %}
+                  <img src="/media/{{ review.userID.avatar }}" width="50px">
+                  {% else %}
+                    {% if review.userID.socialAccount %}
+                    <img src="{{ review.userID.socialAccount.get_avatar_url }}" width="50px">
+                    {% else %}
+                    <img src="/media/user/defaultAvatar.jpg" width="50px">
+                    {% endif %}
+                  {% endif %}
+                </span>
+                <a href="{% url 'user:wall' review.userID.id %}">{{ review.userID }}</a>
+                <p class = 'text'>{{ review.review }} - {{ review.rating }}</p>
+                <span class='datetime'>{{ review.created_at }}</span>
+            </div>
+            {% endfor %}
+            
+        {% else %}
+            <p>No reviews yet.</p>
+        {% endif %}
+</div>
+        
+    
+            
+{% endblock %}
