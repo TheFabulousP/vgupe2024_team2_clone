@@ -26,7 +26,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 SECRET_KEY = 'django-insecure-^)xvokc8x1$wi8%8uo=e5hvtx+%dfu&s9hxeexe&032o@f3497'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ['*'] 
 
@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+    'whitenoise.runserver_nostatic',
 ]
 
 X_FRAME_OPTIONS = 'ALLOWALL'
@@ -63,6 +64,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
+    "whitenoise.middleware.WhiteNoiseMiddleware",
 ]
 
 SITE_ID = 1
@@ -168,7 +170,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
 STATIC_URL = '/static/'
-# STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+# STATIC_ROOT = BASE_DIR / 'static'
 
 STATICFILES_DIRS = [
   os.path.join(BASE_DIR, "static"),
