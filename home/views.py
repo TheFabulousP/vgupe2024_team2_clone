@@ -4,10 +4,12 @@ from django.http import HttpResponseRedirect, FileResponse
 from django.shortcuts import HttpResponse, get_object_or_404, redirect, render
 from django.views import View
 from django.utils import timezone
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from home.forms import *
 from home.models import *
 from home.functions import *
-import os
+import os, random, time
+from home.util import Notification
 
 # Create your views here.
 
@@ -19,25 +21,69 @@ class indexView(View):
       "web":"Home",
       "cssFiles": [],
       "socialAccount": getSocialAccount(request),
+      "books": {
+        "random": Book.objects.get(id = random.randint(1, len(Book.objects.all()))),
+        "literature": random.sample(list(Book.objects.filter(liteCate = 1)), 6),
+        "trending": random.sample(list(Book.objects.all()), 6),
+        "favorite": random.sample(list(Book.objects.all()), 6),
+      }
     }
     return render(request, 'home/index.html',context)
+
+class faqView(View):
+  def get(self, request):
+    context = {
+      "web":"FAQ",
+      "cssFiles": [],
+      "socialAccount": getSocialAccount(request),
+    }
+    return render(request, 'home/faq.html',context)
+
+class contactView(View):
+  def get(self, request):
+    context = {
+      "web":"Contact",
+      "cssFiles": [],
+      "socialAccount": getSocialAccount(request),
+    }
+    return render(request, 'home/contact.html',context)
 
 
 class galleryView(View):
   def get(self, request):
-    books = search(request)[1:20]
+    books = search(request)
+    print(len(books))
+    
+    page = request.GET.get('page', 1)
+    paginator = Paginator(books, 10)
+    
+    try:
+        books = paginator.page(page)
+    except PageNotAnInteger:
+        books = paginator.page(1)
+    except EmptyPage:
+        books = paginator.page(paginator.num_pages)
+        
+    min = paginator.num_pages - 4
+    max = paginator.num_pages
+    
     context = {
       "web":"Search",
       "books": books,
       "cssFiles": ["/static/home/panel.css",
                    "/static/home/search.css"],
       "socialAccount": getSocialAccount(request),
+      "min":min,
+      "max":max
     }
     return render(request, 'home/gallery.html',context)
 
 
 class bookView(View):
   def get(self, request, id):
+    
+    notification_temp = request.session.pop('review_submit', None)
+    
     book = Book.objects.get(id=id)
     copies = Copy.objects.filter(bookID=book)
     mod_counts = copies.values('userID').annotate(count=Count('id'))
@@ -55,6 +101,7 @@ class bookView(View):
       "form": form,
       "socialAccount": getSocialAccount(request),
       "mods_objects_dict":mods_objects_dict,
+      "notification":Notification(notification_temp["title"],notification_temp["content"],notification_temp["status"]) if notification_temp else None,
     }
     return render(request, "home/book.html", context)
   
@@ -66,13 +113,20 @@ class bookView(View):
       "review": request.POST.get("review"),
       "created_at": timezone.now(),
     }
+    
+
     form = ReviewForm(data)
     book = Book.objects.get(id=id)
     if form.is_valid():
-      print("User:",form.data["userID"])
-      print("Book",form.data["bookID"])
+
       form.save()
-      messages.success(request, "Your rating and review has been saved.")
+      notification = {
+        "title": "Review sent successfully.",
+        "content": "Your review has been sent successfully. Thank you for your feedback.",
+        "status": "success"
+      }  
+      messages.success(request, "Profile info updated successfully.")
+      request.session['review_submit'] = notification
       return redirect("home:book", id)
     else:
       context = {
@@ -149,4 +203,10 @@ class borrowView(View):
               'copy':copy,
           }
           return render(request, "home/borrowance.html", context)
-      
+    
+def handling_404(request, exception):
+  context = {
+    "web":"Page not found",
+    "socialAccount": getSocialAccount(request),
+  }
+  return render(request, '404.html',context)

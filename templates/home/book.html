@@ -3,172 +3,162 @@
 {% block content %}
 {% load static %}
 {% include 'base/message.html' %}
-<link rel="stylesheet" type = "text/css" href="{% static 'home/book.css' %}">
+<link href="{% static 'book/final-teamplate.webflow.6f28bf78a.css' %}"  rel="stylesheet" type="text/css" />
 
-<div class="container">
-    <div class="left">
-        <h2>{{book.title}}</h2>
-        <p><strong>Author:</strong> {{book.author}}</p>
-        <p><strong>Publisher:</strong> {{book.publisher}}</p>
-        <p><strong>Language:</strong> {{book.language}}</p>
-        <p><strong>Publication:</strong> {{book.publication}}</p>
-        <p><strong>Description:</strong> {{book.description}}</p>
+     <div class="main-section---user-profile">
+        <div class="container-default w-container">
+          <div class="block-sticky-top---main-contain---single-book">
+            <div class="w-layout-grid brix---grid-2-columns-gap-column-80px">
+              <div id="w-node-_5a17ac72-1850-1981-dc72-26f836fd84b8-7467042b" class="single-book---book-cover">
+                <div class="brix---mg-bottom-32px-3">
+                  <div class="brix---image-wrapper-br-24px-shadow">
     
-        {% if book.pdfFile %}
-        <a href="{% url 'home:bookPDF' book.id %}" class="btn">Read Book</a>
-        {% endif %}
-        {% if user.is_authenticated and user.role >= 1 %}
-        <a href="{% url 'mod:addCopy' book.id %}" class="btn">Add Copy</a>
-        <a href="{% url 'mod:editBook' book.id %}" class="btn">Edit Book</a>
-        {% endif %}
-        
-        <p><strong>Choose a provider:</strong></p>
-        <form id="borrowForm" action="{% url 'home:borrow' %}" method="post">
-        {% csrf_token %}
-        <div class="dropdown">
-            <input type="text" id="selectedOption" value="Please select a provider" readonly name="source"> <!-- Default value set to "Please select a provider" -->
-            <button class="dropdown-button" onclick="toggleDropdown()">
-              <span class="down-arrow"></span>
-              <span class="text">Dropdown</span>
-            </button>
-            <div class="dropdown-content" id="dropdownContent">
-                {% for mod, count in mods_objects_dict.items %}
-                <a href="#" onclick="selectOption('{{ mod.first_name }}', '{{ mod.id }}', event)">{{ mod.first_name }} ({{ count }} copies available)</a>
-                {% endfor %}
+                    
+
+                    {% if book.coverImage %}          
+                      {% if book.manual == True  %} 
+                      <img src="{{ book.coverImage.url }}" alt="" class="brix---book-cover" />
+                
+                      {% else %}   
+                      <img src="{{ book.coverImage }}" alt="" class="brix---book-cover" />
+                
+                      {% endif %}                 
+                    {% else %}   
+                    <img src="/media/book/defaultCover.jpg" alt="" class="brix---book-cover" />         
+       
+                    {% endif %}  
+
+                  </div>
+                </div>
+              </div>
+              <div id="w-node-_743cabc5-f3ec-dfd2-c79f-f1cd26c67777-7467042b" class="div-block-100">
+                <div class="brix---mg-bottom-8px-4">
+                  <div class="brix---color-neutral-816">
+                    <h3 class="single-book---book-title">{{book.title}}</h3>
+                  </div>
+                </div>
+                <div class="brix---mg-bottom-40px-6">
+                  <div class="brix---color-neutral-815">
+                    <p class="single-book---author"><strong>Author</strong>: {{book.author}}</p>
+                    <p class="single-book---author"><strong>Publisher</strong>: {{book.publisher}}</p>
+                    <p class="single-book---publish-year"><strong>Publication</strong>: {{book.publication}}</p>
+                    <p class="single-book---author"><strong>Language</strong>: {{book.language}}</p>
+                    <p class="single-book---provider"><strong>Provider</strong>: Vietnamese German University (3 copies available)</p>
+                    <p class="single-book---author"><strong>Location</strong>: Ring road 4, Quarter 4, Thoi Hoa Ward, Ben Cat Town, Binh Duong Province</p>
+                    <p class="single-book---description"><strong>Description</strong>: {{book.description}}</p>
+                  </div>
+                  <div class="block-of-check-out-button"><a href="#" class="brix---btn-primary-6 w-button">Check Out</a></div>
+                </div>
+              </div>
             </div>
+          </div>
+          <div class="divider"></div>
+          <h2 class="text-500 bold mg-bottom-12px">Comments</h2>
+          <div class="feedback-submission-form-block---brix w-form">
+            <style>
+              .rating {
+                margin-top: 10px; /* Reduced space between "Rating" and stars */
+                margin-bottom: 30px; /* Increased space between stars and text area */
+                border: none;
+                float: left;
+              }
+              
+              .rating > label {
+                color: #90A0A3;
+                float: right;
+              }
+              
+              .rating > label:before {
+                margin: 5px;
+                font-size: 2em;
+                font-family: FontAwesome;
+                content: "\f005";
+                display: inline-block;
+              }
+              
+              .rating > input {
+                display: none;
+              }
+              
+              .rating > input:checked ~ label,
+              .rating:not(:checked) > label:hover,
+              .rating:not(:checked) > label:hover ~ label {
+                color: #F79426;
+              }
+              
+              .rating > input:checked + label:hover,
+              .rating > input:checked ~ label:hover,
+              .rating > label:hover ~ input:checked ~ label,
+              .rating > input:checked ~ label:hover ~ label {
+                color: #FECE31;
+              }
+            </style>
+            
+            
+            <form action="{% url 'home:book' book.id%}" id="wf-form-Feedback-Submission-Form-Block---Preview-Page" name="wf-form-Feedback-Submission-Form-Block---Preview-Page" data-name="Feedback Submission Form Block - Preview Page" method="post" class="feedback-submission-form---brix" data-wf-page-id="66594a63dd0674ef7467042b" data-wf-element-id="5604945f-401b-156c-35a5-b3ab59810b36">
+              {% csrf_token %}
+              <h3>Rating</h3>
+              <div class="rating">
+                <input type="radio" id="star5" name="rating" value="5" />
+                <label class="star" for="star5" title="Awesome" aria-hidden="true"></label>
+                <input type="radio" id="star4" name="rating" value="4" />
+                <label class="star" for="star4" title="Great" aria-hidden="true"></label>
+                <input type="radio" id="star3" name="rating" value="3" />
+                <label class="star" for="star3" title="Very good" aria-hidden="true"></label>
+                <input type="radio" id="star2" name="rating" value="2" />
+                <label class="star" for="star2" title="Good" aria-hidden="true"></label>
+                <input type="radio" id="star1" name="rating" value="1" />
+                <label class="star" for="star1" title="Bad" aria-hidden="true"></label>
+              </div>
+              <br>
+              <div class="text-area-div---brix">
+                <br>
+                <textarea placeholder="If you have any additional feedback, please type it in here..." maxlength="5000" id="Additional-Feedback-feedback-submission-form-preview" name="review" data-name="Additional Feedback" class="text-area---brix w-input" required></textarea>
+              </div>
+              <input type="submit" data-wait="Please wait..." class="submit-button-comment w-button" value="Comment" />
+            </form>
+          </div>
+          <div class="divider"></div>
+          <h2 class="text-500 bold mg-bottom-12px">Reviews </h2>
         </div>
-          
-        <input type="hidden" name="bookID" value="{{ book.id }}">
-        <input type="hidden" name="userID" value="{{ user.id }}">
-
-<!-- Container for "See more books" links -->
-<div class="see-more-container">
-    {% for mod, count in mods_objects_dict.items %}
-    <a id="seeOption{{ mod.id }}" href="{% url 'home:shelf' mod.id %}" style="display: none;">See more books of {{ mod.first_name }}</a>
-    {% endfor %}
-</div>
-<button type="submit" class="btn">Borrow</button>
-</form>
-<script>
-
-    function validateAndSubmitForm(event) {
-        var selectedOptionInput = document.getElementById("selectedOption");
-        
-        if (selectedOptionInput.value === "Please select a provider") {
-            // If the selected option is still the default one, display an alert message
-            alert("Please select a provider");
-            event.preventDefault(); // Prevent the form from being submitted
-        }
-    }
-    
-    document.getElementById("borrowForm").addEventListener("submit", validateAndSubmitForm);
-
-
-    document.addEventListener('click', function(event) {
-      var dropdownContent = document.getElementById("dropdownContent");
-      var selectedOptionInput = document.getElementById("selectedOption");
-      
-      if (!event.target.matches('.dropdown-button') && !event.target.matches('.dropdown-content')) {
-        dropdownContent.style.display = "none";
-      }
-    });
-    
-    function toggleDropdown() {
-      event.preventDefault();
-      var dropdownContent = document.getElementById("dropdownContent");
-      if (dropdownContent.style.display === "none" || dropdownContent.style.display === "") {
-        dropdownContent.style.display = "block";
-      } else {
-        dropdownContent.style.display = "none";
-      }
-    }
-    
-    function selectOption(name, id, event) {
-        event.preventDefault();
-        var selectedOptionInput = document.getElementById("selectedOption");
-        selectedOptionInput.value = name;
-    
-        // Show the corresponding link based on the selected option
-        {% for mod, count in mods_objects_dict.items %}
-        document.getElementById("seeOption{{ mod.id }}").style.display = id === '{{ mod.id }}' ? 'inline' : 'none';
-        {% endfor %}
-    }
-    
-    // Display the "See more books" link for the default option initially
-    var defaultOption = document.getElementById("selectedOption").value;
-    selectOption(defaultOption, event); // Pass the event as an argument to the function
-    </script>
-        
-            </div>
-            <div class="right">
-                {% if book.coverImage %}
-                    {% if book.manual == True  %}
-                    <img src="/media/{{ book.coverImage }}"  alt="image">
-                    {% else %}
-                    <img src="{{ book.coverImage }}"  alt="image">
-                    {% endif %}
-                {% else %}
-                <img src="/media/book/defaultCover.jpg"  alt="image">
-                {% endif %}
-            </div>
-        </div>
-<div class = "container">
-    <div class="left">
-        <h3>Rating & Reviews</h3>
-        
-        {% if user.username %}
-        <form method="post" action="" class="mt-6 bg-gray-100 rounded-sm">
-        {% csrf_token %}
-        {% for key, value in form.error.items %}
-            {{value}}
-        {% endfor %}
-
-        {{form.bookID.as_hidden}}
-        {{form.userID.as_hidden}}
-        <label>Rating: </label>
-            {{form.rating}}
-        <br>
-        <label>Review: </label>
-            {{form.review}}
-        <br>
-            {{form.created_at.as_hidden}}
-        <div>
-            <button type="submit" class = "submit">Submit</button>
-        </div>
-        {% endif %}
-        </form>
-    </div>
-</div>
-
-    
-<div class="container">
-    {% if book.reviews.all %}
-    <div class="left">
-        <h3>Reader Reviews</h3>
+      </div>
+      <div class="brix---container-default-3---single-book w-container">
+        <div class="sliding-box---single-book">
+          <div data-delay="4000" data-animation="slide" class="brix---slider-wrapper-4 w-slider" data-autoplay="false" data-easing="ease" style="opacity: 1;" data-hide-arrows="true" data-disable-swipe="false" data-w-id="d4fa5326-9a6c-d9a9-68c9-cfe1cbacfc8c" data-autoplay-limit="0" data-nav-spacing="3" data-duration="500" data-infinite="true" role="region" aria-label="carousel">
+            <div class="brix---slider-mask-width-390px w-slider-mask" id="w-slider-mask-0">
+			{% if book.reviews.all %}
         {% for review in book.reviews.all reversed %}
-            <div class="comment">
-                <span style="float: left; width: 70px;">
-                  {% if review.userID.avatar %}
-                  <img src="/media/{{ review.userID.avatar }}" width="50px">
-                  {% else %}
-                    {% if review.userID.socialAccount %}
-                    <img src="{{ review.userID.socialAccount.get_avatar_url }}" width="50px">
-                    {% else %}
-                    <img src="/media/user/defaultAvatar.jpg" width="50px">
-                    {% endif %}
-                  {% endif %}
-                </span>
-                <a href="{% url 'user:wall' review.userID.id %}">{{ review.userID }}</a>
-                <p class = 'text'>{{ review.review }} - {{ review.rating }}</p>
-                <span class='datetime'>{{ review.created_at }}</span>
+          <div class="brix---slide-item-mg-2---5-stars w-slide" aria-label="1 of 5" role="group" aria-hidden="true" style="transform: translateX(-836px); opacity: 1; transition: transform 500ms ease 0s;">
+            <div class="brix---card-testimonial-v13-2" aria-hidden="true"><img src="/static/book/template_{{review.rating}}stars.svg" alt="" class="brix---mg-bottom-24px-2" aria-hidden="true">
+              <div class="brix---flex-horizontal" aria-hidden="true">
+                <div aria-hidden="true">
+                  <div class="brix---mg-bottom-8px-6" aria-hidden="true">
+                    <div class="brix---color-neutral-830" aria-hidden="true">
+                      <h3 class="brix---heading-h4-size" aria-hidden="true">
+                        <a style="text-decoration: none;" href="{% url 'user:wall' review.userID.id %}">{{ review.userID }}</a>
+                      </h3>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <i>{{review.created_at}}</i>
+              <div class="brix---mg-bottom-24px-2" aria-hidden="true">
+                <div class="brix---color-neutral-829" aria-hidden="true">
+                  <p class="brix---paragraph-default-13" aria-hidden="true">{{ review.review }}</p>
+                </div>
+              </div>
             </div>
-            {% endfor %}
-            
-        {% else %}
-            <p>No reviews yet.</p>
-        {% endif %}
-</div>
-        
-    
-            
+          </div>
+        {% endfor %}
+      {% else %}
+        <p>There are no reviews at the moment. Be the first one to review!!!</p>
+      {% endif %}
+			  
+      <div aria-live="polite" aria-atomic="true" class="w-slider-aria-label" data-wf-ignore="">Slide 3 of 5.</div></div>
+      <div class="brix---btn-slider-arrow-left---testimonial-v12-2 w-slider-arrow-left" role="button" tabindex="0" aria-controls="w-slider-mask-0" aria-label="previous slide" style=""><img src="{% static 'book/663073a16383e5d5e16de847_left-arrow-line-icon-elements-brix-templates.svg' %}" loading="lazy" alt="Icon - Elements Webflow Library - BRIX Templates"></div>
+      <div class="brix---btn-slider-arrow-right---testimonial-v12-2 w-slider-arrow-right" role="button" tabindex="0" aria-controls="w-slider-mask-0" aria-label="next slide"><img src="{% static 'book/663073a16383e5d5e16de8d9_right-arrow-line-icon-elements-brix-templates.svg' %}" loading="lazy" alt="Icon - Elements Webflow Library - BRIX Templates"></div>
+      <div class="brix---hidden-desktop w-slider-nav w-round"><div class="w-slider-dot" data-wf-ignore="" aria-label="Show slide 1 of 5" aria-pressed="false" role="button" tabindex="-1" style="margin-left: 3px; margin-right: 3px;"></div><div class="w-slider-dot" data-wf-ignore="" aria-label="Show slide 2 of 5" aria-pressed="false" role="button" tabindex="-1" style="margin-left: 3px; margin-right: 3px;"></div><div class="w-slider-dot w-active" data-wf-ignore="" aria-label="Show slide 3 of 5" aria-pressed="true" role="button" tabindex="0" style="margin-left: 3px; margin-right: 3px;"></div><div class="w-slider-dot" data-wf-ignore="" aria-label="Show slide 4 of 5" aria-pressed="false" role="button" tabindex="-1" style="margin-left: 3px; margin-right: 3px;"></div><div class="w-slider-dot" data-wf-ignore="" aria-label="Show slide 5 of 5" aria-pressed="false" role="button" tabindex="-1" style="margin-left: 3px; margin-right: 3px;"></div></div>
+          </div>
+        </div>
+      </div>
 {% endblock %}
