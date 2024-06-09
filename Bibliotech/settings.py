@@ -30,7 +30,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*'] 
 CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1:8000', 'https://vgupe2024team2clone-production.up.railway.app']
-ACCOUNT_DEFAULT_HTTP_PROTOCOL = 'https'
+
 
 # Application definition
 
