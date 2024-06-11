@@ -5,6 +5,7 @@ from django.contrib import messages
 from .forms import BookForm, CopyForm, ModApplicationForm
 from home.models import *
 from home.functions import *
+from home.util import *
 from datetime import date
 import csv
 import sqlite3
@@ -24,10 +25,10 @@ class addBookView(LoginRequiredMixin, View):
   login_url = "user:login"
 
   def get(self, request):
-    if (request.user.is_authenticated and request.user.role == 1):
-      form = BookForm()
+    if (request.user.is_authenticated and request.user.role > 0):
+      form = BookForm(initial={"status": 1})
       context = {
-        "web": "Add Copy",
+        "web": "Add Book",
         "cssFiles": [],
         "jsFiles": ["/static/mod/addBook.js",
                   ],
@@ -39,7 +40,12 @@ class addBookView(LoginRequiredMixin, View):
       return redirect("home:index")
 
   def post(self, request):
-    form = BookForm(request.POST, request.FILES)
+    data = request.POST.dict()
+    if (request.user.role > 1):
+      data["status"] = 1
+    else:
+      data["status"] = 0
+    form = BookForm(data, request.FILES)
     context = {
       "web": "Add Copy",
       "cssFiles": [],
@@ -48,10 +54,17 @@ class addBookView(LoginRequiredMixin, View):
       "form": form,
     }
     if form.is_valid():
+      print(form.cleaned_data)
       form.save()
-      messages.success(request,f"Book is added successfylly.")
+      if (request.user.role == 2):
+        messages.success(request, 'Your book has been added')
+      else:
+        messages.info(request, "Your book will need approval from admin before added.")
       return redirect("home:gallery")
     else:
+      print(form.cleaned_data)
+      notification = Notification("Action failed","Your form is not valid.","error")
+      context["notification"] = notification
       return render(request, 'mod/addBook.html', context)
 
 
@@ -66,24 +79,30 @@ class addCopyView(LoginRequiredMixin, View):
     form = CopyForm(initial={"bookID": book,
                              "userID": request.user,
                              "regDate": date.today()})
+    copies = Copy.objects.filter(bookID = book.id)
     context = {
       "web": "Add Copy",
       "cssFiles": [],
       "book": book,
       "form": form,
+      "copies":copies,
     }
     return render(request, 'mod/addCopy.html', context)
   
   def post(self, request, id):
-    form = CopyForm(request.POST)
-    book = Book.objects.get(id = id)
     if not (request.user.is_authenticated and request.user.role >= 1):
       messages.error(request, "You don't have the right to add copy.")
       return redirect("home:index")
+    book = Book.objects.get(id = id)
+    data = {
+      "bookID": book,
+      "userID": request.user,
+      "regDate": date.today(),
+      "note": request.POST.get('note'),
+      "status": 1
+    }
+    form = CopyForm(data)
     if form.is_valid():
-      form.bookID = book
-      form.userID = request.user
-      form.regDate = date.today()
       form.save()
       messages.success(request, "Your copy has been added successfully.")
       return redirect("home:book", id)
@@ -116,16 +135,21 @@ class editBookView(LoginRequiredMixin, View):
     return render(request, "mod/editBook.html", context)
 
   def post(self, request, id):
+    print("POST to edit book", id)
     if not(request.user.is_authenticated and request.user.role >= 1):
       messages.error(request, "You don't have the right to edit book.")
       return redirect("home:index")
     book = Book.objects.get(id = id)
-    form = BookForm(request.POST, request.FILES, instance=book)
+    data = request.POST.dict()
+    data["status"] = book.status
+    form = BookForm(data, request.FILES, instance=book)
     if form.is_valid():
+      print("valid")
       form.save()
       messages.success(request, "The book has been edited succesfully.")
-      return redirect("home:book", id)
+      return redirect("mod:addCopy", id)
     else:
+      print("invalid")
       context = {
         "web": "Edit Book",
         "cssFiles": [],
@@ -281,3 +305,39 @@ class importDataView(View):
     # Optional: Refresh Django's database connections
     connections.close_all()
     return HttpResponse("Finished")
+  
+  
+class modManageView(LoginRequiredMixin, View):
+  login_url = "user:login"
+  
+  
+  def get(self, request):
+    context = {
+      "socialAccount": getSocialAccount(request),
+    }
+    return render(request, "mod/modManageBorrowing.html", context)
+    
+  def post(self, request):
+    pass
+  
+  
+class adminManageView(LoginRequiredMixin, View):
+  login_url = "user:login"
+  
+  
+  def get(self, request):
+
+    context = {
+      "socialAccount": getSocialAccount(request),
+      "applications": ModApplication.objects.select_related('applicant').all()
+    }
+    return render(request, "mod/adminManageBorrowing.html", context)
+    
+  def post(self, request):
+    pass
+  
+  
+def deleteBook(request,id):
+  book = Book.objects.get(id = id)
+  book.delete()
+  return redirect("home:shelf", request.user.id)

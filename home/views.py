@@ -8,7 +8,7 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from home.forms import *
 from home.models import *
 from home.functions import *
-import os, random, time
+import os, random, time, operator
 from home.util import Notification
 
 # Create your views here.
@@ -35,7 +35,6 @@ class faqView(View):
   def get(self, request):
     context = {
       "web":"FAQ",
-      "cssFiles": [],
       "socialAccount": getSocialAccount(request),
     }
     return render(request, 'home/faq.html',context)
@@ -80,6 +79,52 @@ class galleryView(View):
     }
     return render(request, 'home/gallery.html',context)
 
+
+class dashboardView(View):
+  def get(self, request):
+    books = []
+    for book in Book.objects.all():
+      num_borrow = 0
+      num_copy = 0
+      for copy in Copy.objects.filter(bookID = book):
+        num_borrow += len(Borrowance.objects.filter(copyID = copy))
+        num_copy += 1
+      books.append({
+        "id": book.id,
+        "title": book.title,
+        "number_borrow": num_borrow,
+        "number_copy": num_copy
+      })
+    sorted_books_borrow = sorted(books, key=lambda x: x['number_borrow'], reverse=True)
+    sorted_books_copy = sorted(books, key=lambda x: x['number_copy'], reverse=True)
+    users = []
+    for user in User.objects.all():
+      num_borrow = 0
+      num_copy = 0
+      num_borrow += len(Borrowance.objects.filter(userID = user))
+      num_copy += len(Copy.objects.filter(userID = user))
+      users.append({
+        "id": user.id,
+        "name": user.first_name,
+        "number_borrow": num_borrow,
+        "number_copy": num_copy
+      })
+    sorted_users_borrow = sorted(users, key=lambda x: x['number_borrow'], reverse=True)
+    sorted_users_copy = sorted(users, key=lambda x: x['number_copy'], reverse=True)
+    context = {
+      "web":"Dashboard",
+      "cssFiles": [],
+      "socialAccount": getSocialAccount(request),
+      "books": books,
+      "books_borrow": sorted_books_borrow[:5],
+      "books_copy": sorted_books_copy[:5],
+      "users": users,
+      "users_borrow": sorted_users_borrow[:5],
+      "users_copy": sorted_users_copy[:5],
+      "copies": Copy.objects.all(),
+      "borrowances": Borrowance.objects.all()
+    }
+    return render(request, 'home/dashboard.html', context)
 
 class bookView(View):
   def get(self, request, id):
@@ -161,6 +206,9 @@ class shelfView(View):
   template = "home/shelf.html"
 
   def get(self, request, id):
+    owner = User.objects.get(id = id)
+    copies = Copy.objects.filter(userID =id)
+    
     books = search(request)
     books = books.filter(copy__userID_id=id).distinct()
     print(len(books))
@@ -187,6 +235,8 @@ class shelfView(View):
       "min":min,
       "max":max,
       "books":books,
+      "copies": copies,
+      "ownerSocialAccount": getSocialAccountByUser(owner),
     }
     return render(request, self.template, context)
   def post(self, request, username):
@@ -233,8 +283,28 @@ class resultView(LoginRequiredMixin, View):
   def get(self, request):
     return redirect("home:index")
   def post(self, request):
+    
+    borrowedDate = timezone.now()
+    expiredDate = timezone.now() + timezone.timedelta(days=14)
+    status = 0
+    deposit = None
+    
+    copy = Copy.objects.filter(bookID_id=request.POST.get("copyID"))[0]
+    copyID_id = copy.id
+    userID_id = request.user.id
+    
+    new_borrowance = Borrowance(
+      borrowDate=borrowedDate,
+      expiredDate=expiredDate,
+      status=status,
+      deposit=deposit,
+      copyID_id=copyID_id,
+      userID_id=userID_id
+    )
+    new_borrowance.save()
+    
     context={
       "web":"Checkout complete",
       "socialAccount": getSocialAccount(request),
     }
-    return render(request, "home/checkoutResult.html")
+    return render(request, "home/checkoutResult.html",context)

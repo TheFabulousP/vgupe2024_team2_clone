@@ -1,17 +1,81 @@
-# vgupe2024_team2
-### Team members:
-- Huỳnh Lê An Phú
-- Đỗ Minh Quang
-- Lê Công Nguyên
-- Dương Thiên Hương
-- Phan Tâm Như
-- Nguyễn Minh Anh
+# Bibliotech. Online Library Management
+***vgupe2024_team2***
 
-## Project: Online Library Management
-Online Library Management includes a webpage that allows users to access library resources such as books, journals, and multimedia materials over the internet. The website allows users to quickly and conveniently search for, checkout, reserve and return books, articles, journals,...
-This system makes it simpler for the administrator to manage the users' accounts as well as keep track of books, articles, and journals,... and it is also include maintaining a database for entering new books and recording borrowed books with their due dates.
+## Team members
+| Full Name    | Student's ID  |
+| ------------ | ------------- |
+| [Huỳnh Lê An Phú](https://github.com/TheFabulousP) | 1042110 |
+| [Đỗ Minh Quang](https://github.com/minWang916) | 10421051 |
+| [Lê Công Nguyên](https://github.com/lcnguyencs) | 10421043 |
+| [Dương Thiên Hương](https://github.com/dxd1019) | 10421019 |
+| [Phan Tâm Như](https://github.com/nhuhuynh1508) | 10421122 |
+| [Nguyễn Minh Anh](https://github.com/sumirez) | 10421068 |
 
-----
+
+## Project Description
+### Overview
+The Online Library Management Application is a comprehensive system designed to facilitate the rental, review, and management of books through a user-friendly interface. The application supports three primary roles: Users, Moderators, and Admins.
+
+### Features
+- **User Interface**:
+    - **Browse and Filter**: Users can browse books, filter them by categories, authors, publications, etc.
+    - **Rent Books**: Users can rent books for a specified duration.
+    - **Review and Like**: Users can like and review books.
+    - **Moderator Application**: Users can apply to become moderators.
+
+- **Moderator Interface**:
+    - **Book Management**: Moderators can list and manage books, track their availability, and send notifications when leases expire.
+    - **Approval Process**: Moderators submit books for admin approval before they become available to users.
+
+- **Admin Role**:
+    - **Approval**: Admins approve books submitted by moderators, ensuring quality and compliance.
+
+### Technologies Used
+- **Backend**:
+    - **Django and Python**: Chosen for their robustness, scalability, and the extensive online resources available for development support. Django's built-in admin interface simplifies administrative tasks, making it an ideal choice for managing complex database operations and user roles.
+- **Frontend**:
+    - **Webflow**: Utilized to streamline the design-to-production process, allowing for rapid prototyping and a polished user interface. Webflow's visual editor makes it easy to create responsive designs without extensive front-end coding.
+
+### Challenges faced
+- **Backend-Frontend Linkage**: Integrating the backend and frontend was challenging, often leading to unexpected display issues and undesired effects on the backend interface.
+- **Frontend Difficulties**: Implementing CSS properties efficiently to create a smooth and beautiful UI was a significant challenge for the front-end team.
+
+### Future Features
+- **Payment Integration**: We plan to implement a payment feature, allowing users to pay for book rentals seamlessly within the application.
+
+## How to install and run the package
+### Prequisites
+- **Python 3.9 or higher:** Ensure Python is installed on your system. We use Python 3.9.1 for development
+- **sqlite3:** Required for database view and management.
+
+### Installation Steps
+The issue with your MD file could be related to indentation and formatting of code blocks. Here's a refined version:
+
+### Installation Steps
+1. **Clone the Repository:**
+   ```sh
+   git clone https://github.com/galvdat-hthieu/vgupe2024_team2.git
+   cd vgupe2024_team2
+   ```
+
+2. **Install Required Packages:**
+   Install all necessary packages listed in `requirements.txt`:
+   ```sh
+   pip install -r requirements.txt
+   ```
+
+### Running the Project
+To run the project, execute the following command in the terminal:
+```sh
+python manage.py runserver
+```
+
+## File Structure
+/.document: include all of the necessary documentation of this project
+/Bibliotech:
+/...: list all of the folder and what are their uses
+
+## Design and Architectures
 
 ### System requirement
 
@@ -57,3 +121,19 @@ Our team have four actors in our system:
 <!-- <img src=".document/flowChart.png" alt="Alt text" title="flow chart">
 <img src=".document/usecase_guest.png" alt="Alt text" title="usecase diagram" width=400px>
 <img src=".document/usecase_other.png" alt="Alt text" title="usecase diagram"> -->
+
+## Prototypes
+Prototyped UI
+
+Deployment here
+
+## Credits
+List all the tasks and history of contribution (if possible)
+
+## Contributing
+1. Fork and clone the repository
+2. Create a new branch
+3. Submit a pull request
+
+## License
+...
