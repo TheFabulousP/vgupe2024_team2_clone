@@ -1,5 +1,5 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.http import HttpResponseRedirect, FileResponse
 from django.shortcuts import HttpResponse, get_object_or_404, redirect, render
 from django.views import View
@@ -53,6 +53,7 @@ class contactView(View):
 class galleryView(View):
   def get(self, request):
     books = search(request)
+    books = books.annotate(copies_with_status_one=Count('copy', filter=Q(copy__status=1))).filter(copies_with_status_one__gt=0)
     print(len(books))
     
     page = request.GET.get('page', 1)
@@ -132,9 +133,9 @@ class bookView(View):
     notification_temp = request.session.pop('review_submit', None)
     
     book = Book.objects.get(id=id)
-    copies = Copy.objects.filter(bookID=book)
+    copies = Copy.objects.filter(bookID=book,status=1)
     mod = User.objects.get(id=copies[0].userID_id)
-    
+    providers = Copy.objects.filter(bookID=book, status=1).values('userID__id', 'userID__first_name', 'userID__address').annotate(amount_copies=Count('id'))
     
     form = ReviewForm(initial={"bookID": Book.objects.get(id=id),"userID": request.user,})
     context = {
@@ -143,6 +144,7 @@ class bookView(View):
                    ],
       "time": timezone.now(),
       'book': book,
+      "providers":providers,
       "form": form,
       "socialAccount": getSocialAccount(request),
       "mod":mod,
@@ -207,7 +209,7 @@ class shelfView(View):
 
   def get(self, request, id):
     owner = User.objects.get(id = id)
-    copies = Copy.objects.filter(userID =id)
+    copies = Copy.objects.filter(userID =id).order_by('bookID')
     
     books = search(request)
     books = books.filter(copy__userID_id=id).distinct()
@@ -255,6 +257,7 @@ class borrowView(LoginRequiredMixin, View):
       return redirect("user:login")
     else:
       
+      
       mod = User.objects.get(id=request.POST.get("mod_id"))
       book = Book.objects.get(id=id)
       copy = Copy.objects.filter(userID_id=mod.id, bookID_id=book.id).first()
@@ -289,7 +292,7 @@ class resultView(LoginRequiredMixin, View):
     status = 0
     deposit = None
     
-    copy = Copy.objects.filter(bookID_id=request.POST.get("copyID"))[0]
+    copy = Copy.objects.filter(bookID_id=request.POST.get("bookID"),status=1,userID=request.POST.get("modID"))[0]
     copyID_id = copy.id
     userID_id = request.user.id
     
@@ -303,6 +306,8 @@ class resultView(LoginRequiredMixin, View):
     )
     new_borrowance.save()
     
+    copy.status = 2
+    copy.save()
     context={
       "web":"Checkout complete",
       "socialAccount": getSocialAccount(request),

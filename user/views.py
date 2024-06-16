@@ -1,6 +1,8 @@
 from allauth.socialaccount.models import SocialAccount
 from django.contrib import messages
 import os
+import hashlib
+from django.db.models import Q
 from django.contrib.auth import (authenticate, login, logout,
                                  update_session_auth_hash)
 from django.contrib.auth import views as auth_views
@@ -90,10 +92,19 @@ def activate(request, uidb64, token):
   return redirect("home:index")
 
 
+def hash_string(input_string):
+  sha256_hash = hashlib.sha256()
+  sha256_hash.update(input_string.encode('utf-8'))
+  return sha256_hash.hexdigest()
+
 class registerView(View):
   def get(self, request):
     usernames = list(User.objects.values_list('username', flat=True))
     emails = list(User.objects.values_list('email', flat=True))
+    
+    usernames = [hash_string(username) for username in usernames]
+    emails = [hash_string(email) for email in emails]
+    
     context = {
       "web": "Register",
       "usernames":usernames,
@@ -395,18 +406,48 @@ class userBorrowanceManagerView(LoginRequiredMixin,View):
   
   def get(self, request):
     
+    borrowancesRequests = Borrowance.objects.filter(userID_id=request.user.id, status=0).select_related(
+    'copyID__bookID',  
+    'copyID__userID'  
+    ).order_by('-borrowDate')
+    
+    borrowancesBorrowing = Borrowance.objects.filter(userID_id=request.user.id, status=2).select_related(
+    'copyID__bookID',
+    'copyID__userID'
+    ).order_by('-borrowDate')
+    
+    borrowancesHistory = Borrowance.objects.filter(
+        Q(userID_id=request.user.id),
+        Q(status=1) | Q(status=3)
+    ).select_related('copyID__bookID','copyID__userID').order_by('-borrowDate')
+    
     context = {
       "web":"Borrow/Return books",
       "socialAccount": getSocialAccount(request),
+      "borrowancesRequests":borrowancesRequests[:5],
+      "borrowancesBorrowing":borrowancesBorrowing[:5],  
+      "borrowancesHistory":borrowancesHistory[:5],
     }
     
     return render(request, "user/borrowManage.html", context=context)
   
   def post(self, request):
     
-    context = {
-      "web":"Borrow/Return books",
-      "socialAccount": getSocialAccount(request),
-    }
-    return render(request, "user/borrowManage.html", context=context) 
+    action = request.POST.get("action")
+    if action == "delete":
+      borrowance = Borrowance.objects.get(id=request.POST.get("borrowanceId"))
+      copy = Copy.objects.get(id=borrowance.copyID_id)
+      copy.status = 1
+      copy.save()
+      borrowance.delete()   
+        
+    if action == "return":
+      borrowance = Borrowance.objects.get(id=request.POST.get("borrowanceId"))
+      borrowance.status = 3
+      borrowance.save()
+      
+      copy = Copy.objects.get(id=borrowance.copyID_id)
+      copy.status = 1
+      copy.save()
+    return redirect("user:borrow")
   

@@ -38,105 +38,104 @@
   </head>
   <body>
     
-      <div data-animation="default" data-collapse="medium" data-duration="400" data-easing="ease" data-easing2="ease" role="banner" class="header-wrapper w-nav">
-        <div class="container-default w-container">
-          <div class="header-content-wrapper"><a href="/" class="logo-link-wrapper w-nav-brand"><img src="{% static 'base/logo1.svg' %}" style="width:150px" loading="eager" alt="Dashflow X Webflow Template - Logo" /></a>
-            <nav role="navigation" class="header-nav-menu-wrapper-2 w-nav-menu">
-              <ul role="list" class="header-nav-menu-list w-list-unstyled">
-                <li class="header-nav-list-item"><a href="{% url 'home:index' %}" class="header-nav-link-4 w-nav-link" style="max-width: 1268px;">Home</a></li>
-                <li class="header-nav-list-item"><a href="{% url 'home:dashboard' %}" class="header-nav-link-4 w-nav-link" style="max-width: 1268px;">Dashboard</a></li>
-                <li class="header-nav-list-item"><a href="{% url 'home:gallery' %}" class="header-nav-link-4 w-nav-link" style="max-width: 1268px;">All books</a></li>
-                {% if user.role == 1 %}
-                <li class="header-nav-list-item"><a href="{% url 'home:shelf' user.id%}" class="header-nav-link-4 w-nav-link" style="max-width: 1268px;">My library</a></li>
-                {% endif %}
-                <li class="header-nav-list-item"><a href="{% url 'home:faq' %}" class="header-nav-link-4 w-nav-link" style="max-width: 1268px;">FAQs</a></li>
-                <li class="header-nav-list-item"><a href="{% url 'home:contact' %}" class="header-nav-link-4 w-nav-link" style="max-width: 1268px;">Contact</a></li>
-              </ul>              
-            </nav>
-            <div class="header-right-side-container">
-              <div class="hidden-on-mbl">
-                {% if user.is_authenticated %}    
-                  <div class="buttons-row gap-column-12px">
-                    <ul role="list" class="header-nav-menu-list">
-                      <li class="header-nav-list-item">
-                        <div data-hover="true" data-delay="0" class="position-relative---z-index-2 w-dropdown">
-                          <div class="header-nav-link dropdown-header-link w-dropdown-toggle">
-                            {% if socialAccount %}
-                            <img src="{{ socialAccount.get_avatar_url }}" loading="eager" alt="AB - Dashflow X Webflow Template" sizes="(max-width: 1439px) 48px, (max-width: 1919px) 3vw, 48px"  class="avatar-circle _48px" />        
+    <div data-animation="default" data-duration="400" data-easing="ease" data-easing2="ease" role="banner" class="header-wrapper w-nav">
+      <div class="container-default w-container">
+        <div class="header-content-wrapper"><a href="/" class="logo-link-wrapper w-nav-brand"><img src="{% static 'base/logo1.svg' %}" style="width:150px; max-width: 20vw;" loading="eager" alt="Dashflow X Webflow Template - Logo" /></a>
+          <nav role="navigation" class="header-nav-menu-wrapper-2 w-nav-menu">
+            <ul role="list" class="header-nav-menu-list w-list-unstyled" style="display: inline-block;">
+              <li class="header-nav-list-item" style="display: inline-block; min-width: 7vw;"><a href="{% url 'home:dashboard' %}" class="header-nav-link-4 w-nav-link" style="max-width: 1268px;">Dashboard</a></li>
+              <li class="header-nav-list-item" style="display: inline-block; min-width: 7vw;"><a href="{% url 'home:gallery' %}" class="header-nav-link-4 w-nav-link" style="max-width: 1268px;">All books</a></li>
+              {% if user.role == 1 %}
+              <li class="header-nav-list-item" style="display: inline-block; min-width: 7vw;"><a href="{% url 'home:shelf' user.id%}" class="header-nav-link-4 w-nav-link" style="max-width: 1268px;">Bookshelf</a></li>
+              {% endif %}
+              <li class="header-nav-list-item" style="display: inline-block; min-width: 7vw;"><a href="{% url 'home:faq' %}" class="header-nav-link-4 w-nav-link" style="max-width: 1268px;">FAQs</a></li>
+              <li class="header-nav-list-item" style="display: inline-block; min-width: 7vw;"><a href="{% url 'home:contact' %}" class="header-nav-link-4 w-nav-link" style="max-width: 1268px;">Contact</a></li>
+            </ul>              
+          </nav>
+          <div class="header-right-side-container">
+            <div class="hidden-on-mbl">
+              {% if user.is_authenticated %}    
+                <div class="buttons-row gap-column-12px">
+                  <ul role="list" class="header-nav-menu-list">
+                    <li class="header-nav-list-item">
+                      <div data-hover="true" data-delay="0" class="position-relative---z-index-2 w-dropdown">
+                        <div class="header-nav-link dropdown-header-link w-dropdown-toggle">
+                          {% if socialAccount %}
+                          <img src="{{ socialAccount.get_avatar_url }}" loading="eager" alt="AB - Dashflow X Webflow Template" sizes="(max-width: 1439px) 40px, (max-width: 1919px) 3vw, 40px"  class="avatar-circle _48px" />        
+                          {% else %}
+                            {% if user.avatar %}
+                            <img src="/media/{{ user.avatar }}"  alt="AA - Dashflow X Webflow Template" sizes="(max-width: 1439px) 48px, (max-width: 1919px) 3vw, 40px" class="avatar-circle _40px" />
+                            
                             {% else %}
-                              {% if user.avatar %}
-                              <img src="/media/{{ user.avatar }}"  alt="AA - Dashflow X Webflow Template" sizes="(max-width: 1439px) 48px, (max-width: 1919px) 3vw, 48px" class="avatar-circle _48px" />
-                              
-                              {% else %}
-                              <img src="/media/user/defaultAvatar.jpg" loading="eager" alt="AC - Dashflow X Webflow Template" sizes="(max-width: 1439px) 48px, (max-width: 1919px) 3vw, 48px" class="avatar-circle _48px" />
-                              {% endif %}
+                            <img src="/media/user/defaultAvatar.jpg" loading="eager" alt="AC - Dashflow X Webflow Template" sizes="(max-width: 1439px) 40px, (max-width: 1919px) 3vw, 40px" class="avatar-circle _48px" />
                             {% endif %}
-                            <div>{{user.first_name}}</div>
-                            <style>
-                              @font-face {
-                                  font-family: 'Line Rounded Icons';
-                                  src: url('https://uploads-ssl.webflow.com/661a3f3af51abcb8bec1e922/661a3f3af51abcb8bec1e99c_line-rounded-icons.woff2') format('woff2'),
-                                       url('https://uploads-ssl.webflow.com/661a3f3af51abcb8bec1e922/661a3f3af51abcb8bec1e99a_line-rounded-icons.eot') format('embedded-opentype'),
-                                       url('https://uploads-ssl.webflow.com/661a3f3af51abcb8bec1e922/661a3f3af51abcb8bec1e99e_line-rounded-icons.woff') format('woff'),
-                                       url('https://uploads-ssl.webflow.com/661a3f3af51abcb8bec1e922/661a3f3af51abcb8bec1e99b_line-rounded-icons.ttf') format('truetype'),
-                                       url('https://uploads-ssl.webflow.com/661a3f3af51abcb8bec1e922/661a3f3af51abcb8bec1e997_line-rounded-icons.svg') format('svg');
-                                  font-weight: 400;
-                                  font-style: normal;
-                                  font-display: swap;
-                              }
-                          </style>
-                            <div class="line-rounded-icon header-dropdown-icon" style="font-family: 'Line Rounded Icons';"></div>
-                          </div>
-                          <nav class="dropdown-list w-dropdown-list">
-                            <div class="card header-dropdown-card">
-                              <div class="grid-1-column gap-row-12px">
-                                <a href="{% url 'user:info' %}" class="dropdown-link-single w-dropdown-link">View Profile</a>
-                                <a href="{% url 'user:edit' %}" class="dropdown-link-single w-dropdown-link">Edit Profile</a>
-                                <a href="{% url 'user:borrow' %}" class="dropdown-link-single w-dropdown-link">My Borrowings</a> 
-                                {% if request.user.role == 1 and request.user.is_authenticated %}
-                                <a href="{% url 'mod:modManage' %}" class="dropdown-link-single w-dropdown-link">Manage</a>
-                                {% endif %}
-                                {% if request.user.role == 2 and request.user.is_authenticated %}
-                                <a href="{% url 'mod:adminManage' %}" class="dropdown-link-single w-dropdown-link">Manage</a>
-                                {% endif %}
-                                {% if not socialAccount %}
-                                <a href="{% url 'user:changePassword' %}" class="dropdown-link-single w-dropdown-link">Change Password</a>
-                                {% endif %}
-                                <a href="{% url 'user:logout' %}" id="w-node-_73d23224-b21d-29e3-9be0-c0265a137951-9648506f" class="dropdown-link-single w-dropdown-link">Logout</a>
-                              </div>
-                            </div>
-                          </nav>
+                          {% endif %}
+                          <div class="hidden-when-tight">{{user.first_name}}</div>
+                          <style>
+                            @font-face {
+                                font-family: 'Line Rounded Icons';
+                                src: url('https://uploads-ssl.webflow.com/661a3f3af51abcb8bec1e922/661a3f3af51abcb8bec1e99c_line-rounded-icons.woff2') format('woff2'),
+                                     url('https://uploads-ssl.webflow.com/661a3f3af51abcb8bec1e922/661a3f3af51abcb8bec1e99a_line-rounded-icons.eot') format('embedded-opentype'),
+                                     url('https://uploads-ssl.webflow.com/661a3f3af51abcb8bec1e922/661a3f3af51abcb8bec1e99e_line-rounded-icons.woff') format('woff'),
+                                     url('https://uploads-ssl.webflow.com/661a3f3af51abcb8bec1e922/661a3f3af51abcb8bec1e99b_line-rounded-icons.ttf') format('truetype'),
+                                     url('https://uploads-ssl.webflow.com/661a3f3af51abcb8bec1e922/661a3f3af51abcb8bec1e997_line-rounded-icons.svg') format('svg');
+                                font-weight: 400;
+                                font-style: normal;
+                                font-display: swap;
+                            }
+                        </style>
+                          <div class="line-rounded-icon header-dropdown-icon" style="font-family: 'Line Rounded Icons';"></div>
                         </div>
-                      </li>
-                    </ul>
+                        <nav class="dropdown-list w-dropdown-list">
+                          <div class="card header-dropdown-card">
+                            <div class="grid-1-column gap-row-12px">
+                              <a href="{% url 'user:info' %}" class="dropdown-link-single w-dropdown-link">View Profile</a>
+                              <a href="{% url 'user:edit' %}" class="dropdown-link-single w-dropdown-link">Edit Profile</a>
+                              <a href="{% url 'user:borrow' %}" class="dropdown-link-single w-dropdown-link">My Borrowings</a>
+                              {% if request.user.role == 1 and request.user.is_authenticated %}
+                              <a href="{% url 'mod:modManage_get' %}" class="dropdown-link-single w-dropdown-link">Manage</a>
+                              {% endif %}
+                              {% if request.user.role == 2 and request.user.is_authenticated %}
+                              <a href="{% url 'mod:adminManage' %}" class="dropdown-link-single w-dropdown-link">Manage</a>
+                              {% endif %}
+                              {% if not socialAccount %}
+                              <a href="{% url 'user:changePassword' %}" class="dropdown-link-single w-dropdown-link">Change Password</a>
+                              {% endif %}
+                              <a href="{% url 'user:logout' %}" id="w-node-_73d23224-b21d-29e3-9be0-c0265a137951-9648506f" class="dropdown-link-single w-dropdown-link">Logout</a>
+                            </div>
+                          </div>
+                        </nav>
+                      </div>
+                    </li>
+                  </ul>
+                </div>
+              {% else %}  
+                <div class="buttons-row---login-signup gap-column-12px" style="margin: 0 auto;"><a href="{% url 'user:login' %}" class="btn-secondary---login w-inline-block">
+                  <div class="flex-horizontal gap-column-4px">
+                    <div>Login</div>
                   </div>
-                {% else %}  
-                  <div class="buttons-row---login-signup gap-column-12px"><a href="{% url 'user:login' %}" class="btn-secondary---login w-inline-block">
-                    <div class="flex-horizontal gap-column-4px">
-                      <div>Login</div>
-                    </div>
-                  </a><a href="{% url 'user:register' %}" class="btn-primary---signup w-inline-block">
-                    <div class="flex-horizontal gap-column-4px">
-                      <div>Sign up</div>
-                    </div>
-                  </a></div>
-                {% endif %}
-              </div>
-            </div>		
-          </div>
+                </a><a href="{% url 'user:register' %}" class="btn-primary---signup w-inline-block">
+                  <div class="flex-horizontal gap-column-4px">
+                    <div>Register</div>
+                  </div>
+                </a></div>
+              {% endif %}
+            </div>
+          </div>		
         </div>
       </div>
+    </div>
       <div class="main-section">
         <div class="container-default w-container">
           <div class="block-sticky-top---main-contain">
             <div class="wrapper-center-home">
               <div id="w-node-_5b7b5ab1-6d00-c7e0-62e6-f29490555c22-eb07c9ab" class="dashboard-main-content---user-notification">
                 <div id="cards" class="pd-top-24px---activities">
-                  <h2 class="text-500 bold mg-bottom-12px">Admin Notification</h2>
+
                   <div class="card component-card card-one-line">
                     <div data-current="Tab 1" data-easing="ease" data-duration-in="300" data-duration-out="100" class="tabs---brix---user-notification w-tabs">
                       <div data-w-id="308a0b60-35ec-8a25-4891-bdffe6f648a6" style="opacity:0" class="tabs-menu---brix w-tab-menu"><a data-w-tab="Tab 1" class="tab-link-v1---brix w-inline-block w-tab-link w--current"><img loading="eager" src="{% static 'noti/admin/images/placeholder-icon-tabs-1.svg' %}" alt="" class="icon-tabs---brix" />
-                          <div>Action</div>
+                          <div>Pending Requests</div>
                         </a>{% comment %} <a data-w-tab="Tab 2" class="tab-link-v1---brix w-inline-block w-tab-link"><img loading="eager" src="{% static 'noti/admin/images/placeholder-icon-tabs-2.svg' %}" alt="" class="icon-tabs---brix" />
                           <div>Action</div>
                         </a> {% endcomment %}<a data-w-tab="Tab 3" class="tab-link-v1---brix w-inline-block w-tab-link"><img loading="eager" src="{% static 'noti/admin/images/placeholder-icon-tabs-3.svg' %}" alt="" class="icon-tabs---brix" />
@@ -156,44 +155,39 @@
                                   <div id="w-node-_1fc42a17-a1dc-71f0-e3fa-8ea61179a3be-eb07c9ab" class="text-50 bold color-neutral-700">Status</div>
                                 </div>
                                 <div class="rows">
+                                  {% if not bookApplications%}
+                                  <br>
+                                  <p>There is no pending book upload requests!</p>
+                                  {% endif %}
+                                  {% for bookApp in bookApplications %}
                                   <div class="data-block">
-                                    <div class="data-table-row"><img src="images/screenshot-202024-04-15-20203148.png" loading="lazy" width="76" id="w-node-_1fc42a17-a1dc-71f0-e3fa-8ea61179a3c3-eb07c9ab" alt="" class="book-images-size" />
-                                      <div id="w-node-_1fc42a17-a1dc-71f0-e3fa-8ea61179a3c4-eb07c9ab" class="text-100---book-title bold color-neutral-800">Hands-On Machine Learning with Scikit-Learn, Keras, and TensorFlow 3nd Edition</div>
-                                      <div id="w-node-_1fc42a17-a1dc-71f0-e3fa-8ea61179a3c6-eb07c9ab" class="text-100---provider medium">Vietnamese - German University</div>
-                                      <div id="w-node-_1fc42a17-a1dc-71f0-e3fa-8ea61179a3c8-eb07c9ab" class="text-100---time medium">05/05/24</div>
+                                    <div class="data-table-row">
+                                      {% if bookApp.coverImage %}          
+                                        {% if bookApp.manual == True  %}                                    
+                                        <img src="{{ bookApp.coverImage.url }}" loading="lazy" width="76" id="w-node-_1fc42a17-a1dc-71f0-e3fa-8ea61179a3c3-eb07c9ab" alt="" class="book-images-size" />                
+                                        {% else %}   
+                                        <img src="{{ bookApp.coverImage }}" loading="lazy" width="76" id="w-node-_1fc42a17-a1dc-71f0-e3fa-8ea61179a3c3-eb07c9ab" alt="" class="book-images-size" />                                
+                                        {% endif %}                 
+                                      {% else %}   
+                                      <img src="/media/book/defaultCover.jpg" loading="lazy" width="76" id="w-node-_1fc42a17-a1dc-71f0-e3fa-8ea61179a3c3-eb07c9ab" alt="" class="book-images-size" />                                  
+                                      {% endif %}               
+                                      <div id="w-node-_1fc42a17-a1dc-71f0-e3fa-8ea61179a3c4-eb07c9ab" class="text-100---book-title bold color-neutral-800">{{bookApp.bookID.title}}</div>
+                                      <div id="w-node-_1fc42a17-a1dc-71f0-e3fa-8ea61179a3c6-eb07c9ab" class="text-100---provider medium">{{bookApp.uploader.first_name}}</div>
+                                      <div id="w-node-_1fc42a17-a1dc-71f0-e3fa-8ea61179a3c8-eb07c9ab" class="text-100---time medium">{{bookApp.created_at}}</div>
                                       <div id="w-node-_1fc42a17-a1dc-71f0-e3fa-8ea61179a3ca-eb07c9ab" class="combo-button">
-                                        <div class="btn-primary">
-                                          <div class="flex-horizontal gap-column-4px">
-                                            <div>Accept</div>
-                                          </div>
-                                        </div>
-                                        <div class="btn-secondary">
-                                          <div class="flex-horizontal gap-column-4px">
-                                            <div>Reject</div>
-                                          </div>
-                                        </div>
+                                        <form action="{% url 'mod:adminManage_post' bookApp.id%}" method="post">
+                                          {% csrf_token %}
+                                        <input type="submit" value="Approve" class="btn-primary flex-horizontal gap-column-4px" name="action"/>
+                                        </form>
+                                        <form action="{% url 'mod:adminManage_post' bookApp.id%}" method="post">
+                                          {% csrf_token %}
+                                        <input type="submit" value="Decline" class="btn-secondary flex-horizontal gap-column-4px" name="action"/>
+                                        </form>
                                       </div>
                                     </div>
                                   </div>
-                                  <div class="data-block">
-                                    <div class="data-table-row"><img src="images/screenshot-202024-04-16-20203339.png" loading="lazy" id="w-node-_1fc42a17-a1dc-71f0-e3fa-8ea61179a3d9-eb07c9ab" alt="" class="book-images-size" />
-                                      <div id="w-node-_1fc42a17-a1dc-71f0-e3fa-8ea61179a3da-eb07c9ab" class="text-100---book-title bold color-neutral-800">Deep Learning with TensorFlow, Keras, and PyTorch</div>
-                                      <div id="w-node-_1fc42a17-a1dc-71f0-e3fa-8ea61179a3dc-eb07c9ab" class="text-100---provider medium">University of Science - HCM</div>
-                                      <div id="w-node-_1fc42a17-a1dc-71f0-e3fa-8ea61179a3de-eb07c9ab" class="text-100---time medium">06/06/24</div>
-                                      <div id="w-node-_1fc42a17-a1dc-71f0-e3fa-8ea61179a3e0-eb07c9ab" class="combo-button">
-                                        <div class="btn-primary">
-                                          <div class="flex-horizontal gap-column-4px">
-                                            <div>Accept</div>
-                                          </div>
-                                        </div>
-                                        <div class="btn-secondary">
-                                          <div class="flex-horizontal gap-column-4px">
-                                            <div>Reject</div>
-                                          </div>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </div>
+                                  {% endfor %}
+                                  
                                 </div>
                               </div>
                               <div class="overflow-auto">
@@ -206,6 +200,10 @@
                                   <div id="w-node-_1fc42a17-a1dc-71f0-e3fa-8ea61179a3f9-eb07c9ab" class="text-50 bold color-neutral-700">Status</div>
                                 </div>
                                 <div class="rows">
+                                {% if not applications%}
+                                <br>
+                                <p>There is no pending moderator applications!</p>
+                                {% endif %}
                                 {% for application in applications %}     
                                   {% if application.status == 0 %}
                                   <div class="data-block">
@@ -420,22 +418,33 @@
                                   <div id="w-node-bae15ac9-69a9-cb98-c454-e36cb99393a6-eb07c9ab" class="text-50 bold color-neutral-700">Status</div>
                                 </div>
                                 <div class="rows">
-                                  <div class="data-table-row"><img src="images/screenshot-202024-04-15-20203148.png" loading="lazy" width="76" id="w-node-bae15ac9-69a9-cb98-c454-e36cb99393aa-eb07c9ab" alt="" class="book-images-size" />
-                                    <div id="w-node-bae15ac9-69a9-cb98-c454-e36cb99393ab-eb07c9ab" class="text-100---book-title bold color-neutral-800">Hands-On Machine Learning with Scikit-Learn, Keras, and TensorFlow 3nd Edition</div>
-                                    <div id="w-node-bae15ac9-69a9-cb98-c454-e36cb99393ad-eb07c9ab" class="text-100---provider medium">Vietnamese - German University</div>
-                                    <div id="w-node-bae15ac9-69a9-cb98-c454-e36cb99393af-eb07c9ab" class="text-100---time medium">05/05/24</div>
+                                  {% if not bookApplicationsHistory%}
+                                  <br>
+                                  <p>There is no history book upload requests!</p>
+                                  {% endif %}
+                                  {% for bookApp in bookApplicationsHistory %}
+                                  <div class="data-table-row">
+                                    {% if book.coverImage %}          
+                                        {% if book.manual == True  %}                                    
+                                        <img src="{{ book.coverImage.url }}" loading="lazy" width="76" id="w-node-_1fc42a17-a1dc-71f0-e3fa-8ea61179a3c3-eb07c9ab" alt="" class="book-images-size" />                
+                                        {% else %}   
+                                        <img src="{{ book.coverImage }}" loading="lazy" width="76" id="w-node-_1fc42a17-a1dc-71f0-e3fa-8ea61179a3c3-eb07c9ab" alt="" class="book-images-size" />                                
+                                        {% endif %}                 
+                                      {% else %}   
+                                      <img src="/media/book/defaultCover.jpg" loading="lazy" width="76" id="w-node-_1fc42a17-a1dc-71f0-e3fa-8ea61179a3c3-eb07c9ab" alt="" class="book-images-size" />                                  
+                                      {% endif %}  
+                                    
+                                    <div id="w-node-bae15ac9-69a9-cb98-c454-e36cb99393ab-eb07c9ab" class="text-100---book-title bold color-neutral-800">{{bookApp.bookID.title}}</div>
+                                    <div id="w-node-bae15ac9-69a9-cb98-c454-e36cb99393ad-eb07c9ab" class="text-100---provider medium">{{bookApp.uploader.first_name}}</div>
+                                    <div id="w-node-bae15ac9-69a9-cb98-c454-e36cb99393af-eb07c9ab" class="text-100---time medium">{{bookApp.created_at}}</div>
                                     <div class="color-badge green">Accpeted</div>
                                   </div>
-                                  <div class="data-table-row"><img src="images/screenshot-202024-04-16-20203339.png" loading="lazy" id="w-node-bae15ac9-69a9-cb98-c454-e36cb99393b4-eb07c9ab" alt="" class="book-images-size" />
-                                    <div id="w-node-bae15ac9-69a9-cb98-c454-e36cb99393b5-eb07c9ab" class="text-100---book-title bold color-neutral-800">Deep Learning with TensorFlow, Keras, and PyTorch</div>
-                                    <div id="w-node-bae15ac9-69a9-cb98-c454-e36cb99393b7-eb07c9ab" class="text-100---provider medium">University of Science - HCM</div>
-                                    <div id="w-node-bae15ac9-69a9-cb98-c454-e36cb99393b9-eb07c9ab" class="text-100---time medium">06/06/24</div>
-                                    <div class="color-badge red">Rejected</div>
-                                  </div>
+                                  {% endfor %}
+                                  
                                 </div>
                               </div>
                               <div class="overflow-auto">
-                                <div class="text-400 bold color-neutral-800 align-left padding-top-table">Moderator Application</div>
+                                <div class="text-400 bold color-neutral-800 align-left padding-top-table">Moderator123 Application</div>
                                 <div class="data-table-row table-header">
                                   <div id="w-node-bae15ac9-69a9-cb98-c454-e36cb99393c1-eb07c9ab" class="text-50 bold color-neutral-700 self-central---avatar">Avatar</div>
                                   <div id="w-node-bae15ac9-69a9-cb98-c454-e36cb99393c3-eb07c9ab" class="text-50 bold color-neutral-700 self-central---name">Name</div>
@@ -444,7 +453,11 @@
                                   <div id="w-node-bae15ac9-69a9-cb98-c454-e36cb99393c9-eb07c9ab" class="text-50 bold color-neutral-700">Status</div>
                                 </div>
                                 <div class="rows">
-								                {% for application in applications %}
+                                {% if not applicationsHistory%}
+                                <br>
+                                <p>There is no history moderator applications</p>
+                                {% endif %}
+								                {% for application in applicationsHistory %}
                                   {% if application.status == 1 %}
                                   <div class="data-table-row">
                                     {% if application.applicant.avatar %}

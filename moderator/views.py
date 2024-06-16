@@ -1,8 +1,11 @@
-from django.shortcuts import render, HttpResponse, redirect
+from django.shortcuts import render, HttpResponse, redirect, get_object_or_404
+from django.template.loader import render_to_string
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.sites.shortcuts import get_current_site
 from django.views import View
 from django.contrib import messages
 from .forms import BookForm, CopyForm, ModApplicationForm
+from django.core.mail import EmailMessage
 from home.models import *
 from home.functions import *
 from home.util import *
@@ -55,11 +58,19 @@ class addBookView(LoginRequiredMixin, View):
     }
     if form.is_valid():
       print(form.cleaned_data)
-      form.save()
+      newBook = form.save()
       if (request.user.role == 2):
         messages.success(request, 'Your book has been added')
       else:
         messages.info(request, "Your book will need approval from admin before added.")
+        
+        BookApplication.objects.create(
+          bookID=newBook,
+          uploader=request.user,
+          status=0,
+          created_at=timezone.now(),
+        )
+        
       return redirect("home:gallery")
     else:
       print(form.cleaned_data)
@@ -182,6 +193,7 @@ class editCopyView(LoginRequiredMixin, View):
       messages.error(request, "You don't have the right to edit book.")
       return redirect("home:index")
     copy = Copy.objects.get(id = id)
+    print(request.POST.get("note"))
     data = {
       "userID": copy.userID,
       "bookID": copy.bookID,
@@ -309,16 +321,69 @@ class importDataView(View):
   
 class modManageView(LoginRequiredMixin, View):
   login_url = "user:login"
-  
-  
+   
   def get(self, request):
+    if request.user.role != 1:
+      return redirect("home:index") 
+    user_copies = Copy.objects.filter(userID_id=request.user.id)
+    borrowancesRequests = Borrowance.objects.filter(copyID__in=user_copies,status=0).order_by('-borrowDate')
+    borrowancesHistory = Borrowance.objects.filter(copyID__in=user_copies,status__in=[1,3]).order_by('-borrowDate')
+    
+    bookApplication = BookApplication.objects.filter(status=0, uploader=request.user)
+    bookApplicationHistory = BookApplication.objects.filter(status__in=[1,2], uploader=request.user)
     context = {
       "socialAccount": getSocialAccount(request),
+      "borrowancesRequests": borrowancesRequests[:5],
+      "borrowancesHistory": borrowancesHistory[:5],
+      "bookApplication": bookApplication[:5],
+      "bookApplicationHistory": bookApplicationHistory[:5],
     }
     return render(request, "mod/modManageBorrowing.html", context)
+  
+  def post(self, request,id):
+    action = request.POST.get("action")
+    borrowance = get_object_or_404(Borrowance.objects.select_related('userID','copyID','copyID__userID','copyID__bookID'), id=id)
     
-  def post(self, request):
-    pass
+    if action == "Cancel":
+      bookApp = BookApplication.objects.get(id=id, uploader=request.user)
+      bookApp.delete()
+    
+    if action == "Approve":
+      borrowance.status = 2
+      borrowance.save()
+    
+      #Send approve email
+      mail_subject = 'Biblioteck - Your borrowing request has been approved'
+      message = render_to_string('user/template_borrow_result.html', {
+        "borrowance": borrowance,
+        "action": action,
+      })
+      to_email = borrowance.userID.email
+      
+      email = EmailMessage(mail_subject, message, to=[to_email])
+      email.send()
+    
+    if action == "Decline":
+      borrowance.status = 1
+      borrowance.expiredDate = timezone.now() + timezone.timedelta(days=14)
+      borrowance.save()
+      
+      #Send decline email
+      mail_subject = 'Biblioteck - Your borrowing request has been declined'
+      message = render_to_string('user/template_borrow_result.html', {
+        "borrowance": borrowance,
+        "action": action,
+        "domain":get_current_site(request),
+      })
+      to_email = borrowance.userID.email
+      
+      email = EmailMessage(mail_subject, message, to=[to_email])
+      email.send()
+    
+    return redirect("mod:modManage_get")
+
+    
+
   
   
 class adminManageView(LoginRequiredMixin, View):
@@ -327,14 +392,32 @@ class adminManageView(LoginRequiredMixin, View):
   
   def get(self, request):
 
+    if request.user.role != 2:
+      return redirect("home:index")
+    
     context = {
       "socialAccount": getSocialAccount(request),
-      "applications": ModApplication.objects.select_related('applicant').all()
+      "applications": ModApplication.objects.filter(status=0)[:5],
+      "applicationsHistory": ModApplication.objects.filter(status__in=[1, 2])[:5],
+      "bookApplications": BookApplication.objects.filter(status=0)[:5],
+      "bookApplicationsHistory": BookApplication.objects.filter(status__in=[1, 2])[:5],
     }
     return render(request, "mod/adminManageBorrowing.html", context)
     
-  def post(self, request):
-    pass
+  def post(self, request, id):
+    
+    action = request.POST.get("action")
+    if action == "Approve":
+      bookApp = BookApplication.objects.get(id=id)
+      bookApp.status = 1
+      bookApp.save()
+
+    if action == "Decline":
+      bookApp = BookApplication.objects.get(id=id)
+      bookApp.status = 2
+      bookApp.save()
+    
+    return redirect("mod:adminManage")
   
   
 def deleteBook(request,id):
