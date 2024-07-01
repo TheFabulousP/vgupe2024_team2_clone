@@ -423,6 +423,10 @@ class modManageView(LoginRequiredMixin, View):
           borrowance.status = 1
           borrowance.save()
           
+          copy = Copy.objects.get(id=borrowance.copyID.id)
+          copy.status = 1
+          copy.save()
+          
           # Sends a decline email to the borrower
           mail_subject = 'Biblioteck - Your borrowing request has been declined'
           message = render_to_string('user/template_borrow_result.html', {
